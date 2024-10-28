@@ -12,7 +12,7 @@ class TrackCollectionValidator extends AbstractValidator
     public function validateTrackCollection(array $input): void
     {
         if (!empty($input['trackSearchCollection'])) {
-            array_map(function($trackCollectionItem) {
+            array_map(function ($trackCollectionItem) {
                 $this->isMandatory($trackCollectionItem, 'artist');
                 $this->isString($trackCollectionItem, 'artist');
 

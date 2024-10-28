@@ -16,14 +16,15 @@ class SpotifyAuthenticator implements LoggerAwareInterface
     public function __construct(
         private readonly ClientInterface $spotifyAccountClient,
         private readonly string $spotifyClientId,
-        private readonly string $spotifyClientSecret
-    ) {}
+        private readonly string $spotifyClientSecret,
+    ) {
+    }
 
     public function getAccessToken(): string
     {
         $response = $this->request('POST', 'https://accounts.spotify.com/api/token', [
             'headers' => [
-                'Authorization' => 'Basic ' . base64_encode($this->spotifyClientId . ':' . $this->spotifyClientSecret),
+                'Authorization' => 'Basic '.base64_encode($this->spotifyClientId.':'.$this->spotifyClientSecret),
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ],
             'form_params' => [
@@ -31,20 +32,14 @@ class SpotifyAuthenticator implements LoggerAwareInterface
             ],
         ]);
 
-        if ($response->getStatusCode() !== 200) {
-            throw new SpotifyAuthenticatorException(
-                sprintf(
-                    "Unexpected SpotifyAuthenticator response with Code: %s and Body: %s",
-                    $response->getStatusCode(),
-                    (string) $response->getBody()
-                )
-            );
+        if (200 !== $response->getStatusCode()) {
+            throw new SpotifyAuthenticatorException(sprintf('Unexpected SpotifyAuthenticator response with Code: %s and Body: %s', $response->getStatusCode(), (string) $response->getBody()));
         }
 
         $json = (string) $response->getBody();
         $data = json_decode($json, true);
 
-        if(!isset($data['access_token'])) {
+        if (!isset($data['access_token'])) {
             throw new SpotifyAuthenticatorException('Missing access token from Spotify authenticator response');
         }
 
@@ -54,7 +49,7 @@ class SpotifyAuthenticator implements LoggerAwareInterface
     private function request(string $method, string $uri, array $options = []): ResponseInterface
     {
         try {
-            return $this->spotifyAccountClient->request($method, $uri, $options,);
+            return $this->spotifyAccountClient->request($method, $uri, $options);
         } catch (BadResponseException $exception) {
             throw $this->throwExceptionWithParsedMessage($exception);
         }
@@ -67,7 +62,7 @@ class SpotifyAuthenticator implements LoggerAwareInterface
         $responseMessage = $exception->getResponse()->getReasonPhrase();
 
         $message = sprintf(
-            "Unexpected Spotify authentication response. Code: %s | Message: %s | Body: %s",
+            'Unexpected Spotify authentication response. Code: %s | Message: %s | Body: %s',
             $statusCode,
             $responseMessage,
             !empty($responseBodyAsString) ? $responseBodyAsString : '?'
@@ -78,7 +73,8 @@ class SpotifyAuthenticator implements LoggerAwareInterface
         return new SpotifyAuthenticatorException('Something went wrong while retrieving the Spotify bearerToken', $statusCode);
     }
 
-    private function logMessageAsError(string $message): void {
+    private function logMessageAsError(string $message): void
+    {
         $this->logger->error($message);
     }
 }

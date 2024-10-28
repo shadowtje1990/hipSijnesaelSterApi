@@ -20,8 +20,9 @@ class SpotifyTrackFinderService implements TrackFinderServiceInterface, LoggerAw
 
     public function __construct(
         private readonly ClientInterface $spotifyWebClient,
-        private readonly BearerTokenProvider $bearerTokenProvider
-    ) {}
+        private readonly BearerTokenProvider $bearerTokenProvider,
+    ) {
+    }
 
     public function getTrackCollectionFromTrackSearchCollection(TrackSearchCollection $trackSearchCollection): TrackCollection
     {
@@ -39,27 +40,22 @@ class SpotifyTrackFinderService implements TrackFinderServiceInterface, LoggerAw
 
     private function getTrackCollectionFromTrackSearchCollectionItem(TrackSearchCollectionItem $trackSearchCollectionItem): TrackCollectionItem
     {
-        $query = sprintf("?artist=%s&q=%s&type=track&limit=1", $trackSearchCollectionItem->artist, $trackSearchCollectionItem->track);
+        $query = sprintf('?artist=%s&q=%s&type=track&limit=1', $trackSearchCollectionItem->artist, $trackSearchCollectionItem->track);
         $response = $this->request('GET', sprintf('/v1/search%s', $query));
 
-//        $query = sprintf("track:")
-        if ($response->getStatusCode() !== 200) {
-            throw new SpotifyApiException(
-                sprintf(
-                    "Unexpected Spotify response on getUrlsFromTrackCollection with Code: %s and Body: %s",
-                    $response->getStatusCode(),
-                    (string) $response->getBody()
-                )
-            );
+        //        $query = sprintf("track:")
+        if (200 !== $response->getStatusCode()) {
+            throw new SpotifyApiException(sprintf('Unexpected Spotify response on getUrlsFromTrackCollection with Code: %s and Body: %s', $response->getStatusCode(), (string) $response->getBody()));
         }
 
-        return TrackCollectionItem::fromSpotifyJson((string)$response->getBody());
+        return TrackCollectionItem::fromSpotifyJson((string) $response->getBody());
     }
 
     private function request(string $method, string $uri, array $options = []): ResponseInterface
     {
         try {
             $options = $this->appendBearerToken($options);
+
             return $this->spotifyWebClient->request($method, $uri, $options);
         } catch (BadResponseException $exception) {
             throw $this->throwExceptionWithParsedMessage($exception);
@@ -73,7 +69,7 @@ class SpotifyTrackFinderService implements TrackFinderServiceInterface, LoggerAw
         $responseMessage = $exception->getResponse()->getReasonPhrase();
 
         $message = sprintf(
-            "Unexpected Spotify response. Code: %s | Message: %s | Body: %s",
+            'Unexpected Spotify response. Code: %s | Message: %s | Body: %s',
             $statusCode,
             $responseMessage,
             !empty($responseBodyAsString) ? $responseBodyAsString : '?'
@@ -84,13 +80,15 @@ class SpotifyTrackFinderService implements TrackFinderServiceInterface, LoggerAw
         return new SpotifyApiException('Something went wrong while retrieving Spotify Track', $statusCode);
     }
 
-    private function logMessageAsError(string $message): void {
+    private function logMessageAsError(string $message): void
+    {
         $this->logger->error($message);
     }
 
     private function appendBearerToken(array $options): array
     {
         $headers['Authorization'] = "Bearer {$this->bearerTokenProvider->token()}";
+
         return array_merge($options, ['headers' => $headers]);
     }
 }

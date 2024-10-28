@@ -4,7 +4,9 @@ namespace App\Domain;
 
 class TrackSearchCollection
 {
-    private function __construct(public readonly array $items) {}
+    private function __construct(public readonly array $items)
+    {
+    }
 
     public static function fromArray(array $array): self
     {
@@ -14,7 +16,7 @@ class TrackSearchCollection
 
         return new self(
             array_map(
-                function(array $trackCollectionItem) {
+                function (array $trackCollectionItem) {
                     return TrackSearchCollectionItem::fromArray($trackCollectionItem);
                 },
                 $array['trackSearchCollection']

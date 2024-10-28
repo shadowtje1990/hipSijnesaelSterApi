@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -15,8 +17,9 @@ class ApiController
     public function __construct(
         private readonly TrackFinderServiceInterface $trackFinderService,
         private readonly TrackCollectionValidator $validator,
-        private readonly TrackCollectionOutputTransformer $collectionOutputTransformer
-    ) {}
+        private readonly TrackCollectionOutputTransformer $collectionOutputTransformer,
+    ) {
+    }
 
     #[Route('/api/tracks', name: 'get_track_urls', methods: ['POST'])]
     public function getTrackCollectionFromRequestedTracks(Request $request): Response
@@ -33,7 +36,7 @@ class ApiController
     {
         $data = json_decode($request->getContent(), true);
         $searchInput = [
-         'trackSearchCollection' => $data['trackSearchCollection'] ?? []
+            'trackSearchCollection' => $data['trackSearchCollection'] ?? [],
         ];
 
         $this->validator->validateTrackCollection($searchInput);

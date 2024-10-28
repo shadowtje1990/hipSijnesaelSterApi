@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Shared\Validators;
 
@@ -72,6 +74,7 @@ class BaseValidator
                     $this->exitWithError($message);
                 }
             }
+
             return;
         }
 
@@ -92,7 +95,7 @@ class BaseValidator
             return;
         }
 
-        if ((bool)strtotime($input[$fieldName])) {
+        if ((bool) strtotime($input[$fieldName])) {
             return;
         }
 
@@ -110,7 +113,7 @@ class BaseValidator
         }
 
         foreach ($notAcceptedFieldNameCombinations as $notAcceptedFieldName) {
-            if(isset($input[$notAcceptedFieldName])) {
+            if (isset($input[$notAcceptedFieldName])) {
                 $message = sprintf(
                     'Field %s cannot be used in combination with field %s.',
                     $fieldName,

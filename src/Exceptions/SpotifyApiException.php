@@ -6,5 +6,4 @@ use App\Shared\Exceptions\BaseException;
 
 class SpotifyApiException extends BaseException
 {
-
 }

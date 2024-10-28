@@ -16,13 +16,13 @@ class TrackCollectionOutputTransformer
                         'id' => $trackCollectionItem->trackId,
                         'track' => $trackCollectionItem->track,
                         'artist' => $trackCollectionItem->artist,
-                        'releaseDate' =>$trackCollectionItem->releaseDate,
-                        'releaseDatePrecision' =>$trackCollectionItem->releaseDatePrecision,
-                        'externalUrl' =>$trackCollectionItem->externalUrl,
-                        'uri' =>$trackCollectionItem->uri,
+                        'releaseDate' => $trackCollectionItem->releaseDate,
+                        'releaseDatePrecision' => $trackCollectionItem->releaseDatePrecision,
+                        'externalUrl' => $trackCollectionItem->externalUrl,
+                        'uri' => $trackCollectionItem->uri,
                     ];
                 }, $trackCollection->items
-            )
+            ),
         ];
     }
 }

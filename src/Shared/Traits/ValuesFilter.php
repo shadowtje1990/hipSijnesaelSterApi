@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Shared\Traits;
 
@@ -8,17 +10,16 @@ trait ValuesFilter
     {
         return array_map(
             function ($value) {
-
                 if (is_string($value)) {
                     $value = trim($value);
                 }
-                if ($value === 'true') {
+                if ('true' === $value) {
                     $value = true;
                 }
-                if ($value === 'false') {
+                if ('false' === $value) {
                     $value = false;
                 }
-                if ($value === 'null') {
+                if ('null' === $value) {
                     $value = null;
                 }
                 if (is_string($value) && is_numeric($value)) {

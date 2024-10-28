@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Shared\Exceptions;
 
-use Exception;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-abstract class AbstractException extends Exception implements HttpExceptionInterface
+abstract class AbstractException extends \Exception implements HttpExceptionInterface
 {
     protected int $httpStatusCode = 500;
 

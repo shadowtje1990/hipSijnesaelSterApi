@@ -12,7 +12,8 @@ class TrackCollectionItem
         public readonly string $releaseDatePrecision,
         public readonly string $externalUrl,
         public readonly string $uri,
-    ) {}
+    ) {
+    }
 
     public static function fromSpotifyJson(string $json): self
     {
@@ -23,6 +24,7 @@ class TrackCollectionItem
 
         $trackItem = $array['tracks']['items'][0];
         self::makeSureThatTheRequestContainsTheExpectedValue($trackItem);
+
         return new self(
             $trackItem['id'],
             $trackItem['name'],
