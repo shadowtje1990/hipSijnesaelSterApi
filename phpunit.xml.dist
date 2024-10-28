@@ -28,6 +28,10 @@
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <directory>Shared</directory>
+            <file>Utils/CacheFactory.php</file>
+        </exclude>
     </source>
 
     <coverage cacheDirectory="var/cache">

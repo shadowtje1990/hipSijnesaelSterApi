@@ -28,9 +28,4 @@ class TrackSearchCollection
     {
         return new self([]);
     }
-
-    public function isEmpty(): bool
-    {
-        return empty($this->items);
-    }
 }

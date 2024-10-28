@@ -43,11 +43,6 @@ class SpotifyTrackFinderService implements TrackFinderServiceInterface, LoggerAw
         $query = sprintf('?artist=%s&q=%s&type=track&limit=1', $trackSearchCollectionItem->artist, $trackSearchCollectionItem->track);
         $response = $this->request('GET', sprintf('/v1/search%s', $query));
 
-        //        $query = sprintf("track:")
-        if (200 !== $response->getStatusCode()) {
-            throw new SpotifyApiException(sprintf('Unexpected Spotify response on getUrlsFromTrackCollection with Code: %s and Body: %s', $response->getStatusCode(), (string) $response->getBody()));
-        }
-
         return TrackCollectionItem::fromSpotifyJson((string) $response->getBody());
     }
 
