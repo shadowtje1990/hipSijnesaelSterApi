@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Test\Unit\Services;
 
 use App\Domain\TrackCollection;
-use App\Domain\TrackSearchCollection;
 use App\Exceptions\SpotifyApiException;
-use App\Services\SpotifyTrackFinderService;
+use App\TrackFinder\Domain\TrackSearchCollection;
+use App\TrackFinder\Services\SpotifyTrackFinderService;
 use App\Utils\BearerTokenProvider;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 
 class SpotifyTrackFinderServiceTest extends TestCase

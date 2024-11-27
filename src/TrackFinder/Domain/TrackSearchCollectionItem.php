@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Domain;
+namespace App\TrackFinder\Domain;
 
-class TrackCollectionItem
+class TrackSearchCollectionItem
 {
     private function __construct(
         public readonly string $trackId,
         public readonly string $track,
         public readonly string $artist,
+        public readonly string $album,
+        public readonly array $albumImages,
         public readonly string $releaseDate,
         public readonly string $releaseDatePrecision,
         public readonly string $externalUrl,
@@ -15,24 +17,20 @@ class TrackCollectionItem
     ) {
     }
 
-    public static function fromSpotifyJson(string $json): self
+    public static function fromArray(array $array): self
     {
-        $array = json_decode($json, true);
-        if (empty($array['tracks']['items'][0])) {
-            throw new \RuntimeException('"track" item is empty but is required for this request');
-        }
-
-        $trackItem = $array['tracks']['items'][0];
-        self::makeSureThatTheRequestContainsTheExpectedValue($trackItem);
+        self::makeSureThatTheRequestContainsTheExpectedValue($array);
 
         return new self(
-            $trackItem['id'],
-            $trackItem['name'],
-            $trackItem['album']['artists'][0]['name'],
-            $trackItem['album']['release_date'],
-            $trackItem['album']['release_date_precision'],
-            $trackItem['external_urls']['spotify'],
-            $trackItem['uri']
+            $array['id'],
+            $array['name'],
+            !empty($array['album']['artists'][0]['name']) ? $array['album']['artists'][0]['name'] : '',
+            $array['album']['name'],
+            $array['album']['images'],
+            $array['album']['release_date'],
+            $array['album']['release_date_precision'],
+            $array['external_urls']['spotify'],
+            $array['uri']
         );
     }
 
@@ -44,6 +42,10 @@ class TrackCollectionItem
 
         if (empty($array['name'])) {
             throw new \RuntimeException('"name" is empty but is required for this request');
+        }
+
+        if (empty($array['album']['name'])) {
+            throw new \RuntimeException('"album name" is empty but is required for this request');
         }
 
         if (empty($array['album']['artists'][0]['name'])) {

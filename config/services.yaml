@@ -16,6 +16,11 @@ services:
             $env: '%kernel.environment%'
             string $spotifyClientId: '%env(SPOTIFY_CLIENT_ID)%'
             string $spotifyClientSecret: '%env(SPOTIFY_CLIENT_SECRET)%'
+            string $redirectUri: '%env(SPOTIFY_AUTHORIZATION_REDIRECT_URI)%'
+            string $spotifyAccountApi: '%env(SPOTIFY_ACCOUNT_API)%'
+            string $spotifyWebApi: '%env(SPOTIFY_WEB_API)%'
+            $dataDirectory: '%kernel.project_dir%/var/data'
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -41,13 +46,16 @@ services:
     GuzzleHttp\ClientInterface $spotifyAccountClient: '@guzzle_client.spotify.account'
 
     app.services.spotify_track_finder_service:
-        class: App\Services\SpotifyTrackFinderService
-
+        class: App\TrackFinder\Services\SpotifyTrackFinderService
 
     # Register the CacheInterface
     Symfony\Contracts\Cache\CacheInterface:
         factory: [ 'App\Utils\CacheFactory', 'create' ]
 
+    App\Playlist\Services\PlaylistStorageService:
+        arguments:
+            - '@App\Playlist\Services\PlaylistFileStorageService'
+            -
     App\Utils\BearerTokenProvider: '@App\Utils\CachedSpotifyBearerTokenProvider'
 
     App\Utils\CachedSpotifyBearerTokenProvider:

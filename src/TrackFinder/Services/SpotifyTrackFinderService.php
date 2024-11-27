@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\TrackFinder\Services;
 
-use App\Domain\TrackCollection;
-use App\Domain\TrackCollectionItem;
-use App\Domain\TrackSearchCollection;
-use App\Domain\TrackSearchCollectionItem;
 use App\Exceptions\SpotifyApiException;
+use App\TrackFinder\Domain\SpotifySearchItem;
+use App\TrackFinder\Domain\TrackSearchCollection;
 use App\Utils\BearerTokenProvider;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
@@ -24,27 +22,35 @@ class SpotifyTrackFinderService implements TrackFinderServiceInterface, LoggerAw
     ) {
     }
 
-    public function getTrackCollectionFromTrackSearchCollection(TrackSearchCollection $trackSearchCollection): TrackCollection
+    public function search(SpotifySearchItem $trackSearchItem): TrackSearchCollection
     {
-        $items = [];
-        foreach ($trackSearchCollection->items as $trackSearchCollectionItem) {
-            $items[] = $this->getTrackCollectionFromTrackSearchCollectionItem($trackSearchCollectionItem);
-        }
-
-        if (empty($items)) {
-            return TrackCollection::empty();
-        }
-
-        return TrackCollection::fromArrayOfTrackCollectionItems($items);
-    }
-
-    private function getTrackCollectionFromTrackSearchCollectionItem(TrackSearchCollectionItem $trackSearchCollectionItem): TrackCollectionItem
-    {
-        $query = sprintf('?artist=%s&q=%s&type=track&limit=1', $trackSearchCollectionItem->artist, $trackSearchCollectionItem->track);
+        $query = sprintf('?artist=%s&q=%s&type=track&limit=%d&offset=%d', $trackSearchItem->artist, $trackSearchItem->track, $trackSearchItem->limit, $trackSearchItem->offset);
         $response = $this->request('GET', sprintf('/v1/search%s', $query));
 
-        return TrackCollectionItem::fromSpotifyJson((string) $response->getBody());
+        return TrackSearchCollection::fromSpotifyJson((string) $response->getBody());
     }
+
+//    public function getTrackCollectionFromTrackSearchCollection(TrackSearchCollection $trackSearchCollection): TrackCollection
+//    {
+//        $items = [];
+//        foreach ($trackSearchCollection->items as $trackSearchCollectionItem) {
+//            $items[] = $this->getTrackCollectionFromTrackSearchCollectionItem($trackSearchCollectionItem);
+//        }
+//
+//        if (empty($items)) {
+//            return TrackCollection::empty();
+//        }
+//
+//        return TrackCollection::fromArrayOfTrackCollectionItems($items);
+//    }
+//
+//    private function getTrackCollectionFromTrackSearchCollectionItem(TrackSearchCollectionItem $trackSearchCollectionItem): TrackCollectionItem
+//    {
+//        $query = sprintf('?artist=%s&q=%s&type=track&limit=1', $trackSearchCollectionItem->artist, $trackSearchCollectionItem->track);
+//        $response = $this->request('GET', sprintf('/v1/search%s', $query));
+//
+//        return TrackCollectionItem::fromSpotifyJson((string) $response->getBody());
+//    }
 
     private function request(string $method, string $uri, array $options = []): ResponseInterface
     {

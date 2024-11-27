@@ -1,0 +1,15 @@
+when@dev:
+    nelmio_cors:
+        defaults:
+            allow_origin: ['http://localhost:4200', 'https://accounts.spotify.com']
+            allow_credentials: true
+            allow_headers: ['Content-Type', 'Authorization']
+            expose_headers: ['Link']
+            allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE']
+            max_age: 3600
+        paths:
+            '^/api/': # Matches all /api routes
+                allow_origin: ['http://localhost:4200', 'https://accounts.spotify.com']
+                allow_headers: ['Content-Type', 'Authorization']
+                allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE']
+                max_age: 3600

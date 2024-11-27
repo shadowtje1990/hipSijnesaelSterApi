@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Test\Unit\Controller;
 
-use App\Controller\ApiController;
+use App\Controller\PlaylistApiController;
 use App\Domain\TrackCollection;
-use App\Domain\TrackSearchCollection;
-use App\Services\TrackFinderServiceInterface;
+use App\TrackFinder\Domain\TrackSearchCollection;
+use App\TrackFinder\Services\TrackFinderServiceInterface;
 use App\Transformer\TrackCollectionOutputTransformer;
 use App\Validators\TrackCollectionValidator;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +19,7 @@ class ApiControllerTest extends TestCase
     private TrackFinderServiceInterface $trackFinderService;
     private TrackCollectionValidator $validator;
     private TrackCollectionOutputTransformer $collectionOutputTransformer;
-    private ApiController $controller;
+    private PlaylistApiController $controller;
 
     protected function setUp(): void
     {
@@ -27,7 +27,7 @@ class ApiControllerTest extends TestCase
         $this->validator = $this->createMock(TrackCollectionValidator::class);
         $this->collectionOutputTransformer = $this->createMock(TrackCollectionOutputTransformer::class);
 
-        $this->controller = new ApiController(
+        $this->controller = new PlaylistApiController(
             $this->trackFinderService,
             $this->validator,
             $this->collectionOutputTransformer
