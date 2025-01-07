@@ -45,6 +45,7 @@ class PlaylistApiController
     public function getPlaylistNames(): JsonResponse
     {
         $playListNames = $this->playlistStorageService->retrievePlaylistNames();
+
         return new JsonResponse($playListNames);
     }
 

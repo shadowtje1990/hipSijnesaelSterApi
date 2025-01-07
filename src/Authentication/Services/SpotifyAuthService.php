@@ -6,6 +6,7 @@ use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+// TODO: not used anymore. Keep the class for some references and refactoring.
 class SpotifyAuthService implements SpotifyServiceInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
@@ -20,10 +21,11 @@ class SpotifyAuthService implements SpotifyServiceInterface, LoggerAwareInterfac
     protected ?SpotifySession $session = null;
 
     public function __construct(
-        private readonly string $spotifyClientId,
-        private readonly string $spotifyClientSecret,
-        private readonly string $redirectUri,
-        private readonly string $spotifyWebApi,
+        //        private readonly string $spotifyClientId,
+        //        private readonly string $spotifyClientSecret,
+        //        private readonly string $redirectUri,
+        //        private readonly string $spotifyWebApi,
+
         private readonly ClientInterface $spotifyAccountClient,
         array|object $options = [],
         ?SpotifySession $session = null,

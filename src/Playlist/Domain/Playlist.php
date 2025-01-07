@@ -14,10 +14,11 @@ class Playlist
     public static function create(string $jsonPlaylistData): self
     {
         $data = json_decode($jsonPlaylistData, true);
+
         return new self(
-            NameIdentifier::fromString($data['nameIdentifier']),
-            $data['originalName'],
-            $data['playlist']
+            !empty($data['nameIdentifier']) ? NameIdentifier::fromString($data['nameIdentifier']) : NameIdentifier::empty(),
+            $data['originalName'] ?? '',
+            $data['playlist'] ?? ''
         );
     }
 

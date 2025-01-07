@@ -6,5 +6,4 @@ use App\Shared\Exceptions\NotFoundException;
 
 class PlaylistNotFoundException extends NotFoundException
 {
-
 }

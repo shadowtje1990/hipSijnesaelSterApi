@@ -19,4 +19,14 @@ class NameIdentifier
     {
         return new self('');
     }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->value);
+    }
+
+    public function __toString(): string
+    {
+        return $this->value;
+    }
 }

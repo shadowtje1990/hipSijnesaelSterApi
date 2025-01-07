@@ -1,8 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Test\Unit\Utils;
+namespace Tests\Unit\Utils;
 
 use App\Exceptions\SpotifyAuthenticatorException;
 use App\Utils\SpotifyAuthenticator;
@@ -15,83 +13,146 @@ use Psr\Log\LoggerInterface;
 
 class SpotifyAuthenticatorTest extends TestCase
 {
-    private string $clientId = 'test_client_id';
-    private string $clientSecret = 'test_client_secret';
-    private ClientInterface $client;
-    private LoggerInterface $logger;
-    private SpotifyAuthenticator $spotifyAuthenticator;
-
-    protected function setUp(): void
+    protected function tearDown(): void
     {
-        $this->client = $this->createMock(ClientInterface::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-
-        $this->spotifyAuthenticator = new SpotifyAuthenticator($this->client, $this->clientId, $this->clientSecret);
-        $this->spotifyAuthenticator->setLogger($this->logger);
+        \Mockery::close();
     }
 
-    public function testGetAccessTokenReturnsTokenOnSuccessfulResponse()
+    public function testGetAccessTokenReturnsAccessToken(): void
     {
-        $accessToken = 'valid_access_token';
-        $response = $this->createMock(ResponseInterface::class);
-        $responseBody = $this->createMock(StreamInterface::class);
+        $mockClient = \Mockery::mock(ClientInterface::class);
+        $mockResponse = \Mockery::mock(ResponseInterface::class);
+        $mockStream = \Mockery::mock(StreamInterface::class);
 
-        $response->method('getStatusCode')->willReturn(200);
-        $response->method('getBody')->willReturn($responseBody);
-        $responseBody->method('__toString')->willReturn(json_encode(['access_token' => $accessToken]));
+        $mockResponse->shouldReceive('getStatusCode')
+            ->once()
+            ->andReturn(200);
 
-        $this->client->method('request')->willReturn($response);
+        $mockResponse->shouldReceive('getBody')
+            ->once()
+            ->andReturn($mockStream);
 
-        $token = $this->spotifyAuthenticator->getAccessToken();
+        $mockStream->shouldReceive('__toString')
+            ->once()
+            ->andReturn(json_encode(['access_token' => 'test_access_token']));
 
-        $this->assertEquals($accessToken, $token);
+        $mockClient->shouldReceive('request')
+            ->with('POST', 'https://accounts.spotify.com/api/token', \Mockery::on(function ($options) {
+                return isset($options['headers']['Authorization'])
+                    && isset($options['headers']['Content-Type'])
+                    && 'client_credentials' === $options['form_params']['grant_type'];
+            }))
+            ->once()
+            ->andReturn($mockResponse);
+
+        $logger = \Mockery::mock(LoggerInterface::class);
+
+        $authenticator = new SpotifyAuthenticator($mockClient, 'client_id', 'client_secret');
+        $authenticator->setLogger($logger);
+        $accessToken = $authenticator->getAccessToken();
+        $this->assertSame('test_access_token', $accessToken);
     }
 
-    public function testGetAccessTokenThrowsExceptionOnInvalidStatusCode()
+    public function testGetAccessTokenThrowsExceptionOnInvalidStatusCode(): void
     {
+        $mockClient = \Mockery::mock(ClientInterface::class);
+        $mockResponse = \Mockery::mock(ResponseInterface::class);
+        $mockStream = \Mockery::mock(StreamInterface::class);
+
+        $mockResponse->shouldReceive('getStatusCode')
+            ->twice()
+            ->andReturn(400);
+
+        $mockResponse->shouldReceive('getBody')
+            ->once()
+            ->andReturn($mockStream);
+
+        $mockStream->shouldReceive('__toString')
+            ->once()
+            ->andReturn('{"error": "invalid_request"}');
+
+        $mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn($mockResponse);
+
+        $logger = \Mockery::mock(LoggerInterface::class);
+
+        $authenticator = new SpotifyAuthenticator($mockClient, 'client_id', 'client_secret');
+        $authenticator->setLogger($logger);
         $this->expectException(SpotifyAuthenticatorException::class);
-        $this->expectExceptionMessage('Unexpected SpotifyAuthenticator response with Code: 500');
+        $this->expectExceptionMessage('Unexpected SpotifyAuthenticator response with Code: 400');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $responseBody = $this->createMock(StreamInterface::class);
-
-        $response->method('getStatusCode')->willReturn(500);
-        $response->method('getBody')->willReturn($responseBody);
-        $responseBody->method('__toString')->willReturn('{"error": "Internal Server Error"}');
-
-        $this->client->method('request')->willReturn($response);
-
-        $this->spotifyAuthenticator->getAccessToken();
+        $authenticator->getAccessToken();
     }
 
-    public function testGetAccessTokenThrowsExceptionOnMissingAccessTokenInResponse()
+    public function testGetAccessTokenThrowsExceptionOnMissingAccessToken(): void
     {
+        $mockClient = \Mockery::mock(ClientInterface::class);
+        $mockResponse = \Mockery::mock(ResponseInterface::class);
+        $mockStream = \Mockery::mock(StreamInterface::class);
+
+        $mockResponse->shouldReceive('getStatusCode')
+            ->once()
+            ->andReturn(200);
+
+        $mockResponse->shouldReceive('getBody')
+            ->once()
+            ->andReturn($mockStream);
+
+        $mockStream->shouldReceive('__toString')
+            ->once()
+            ->andReturn(json_encode([]));
+
+        $mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn($mockResponse);
+
+        $logger = \Mockery::mock(LoggerInterface::class);
+
+        $authenticator = new SpotifyAuthenticator($mockClient, 'client_id', 'client_secret');
+        $authenticator->setLogger($logger);
+
         $this->expectException(SpotifyAuthenticatorException::class);
         $this->expectExceptionMessage('Missing access token from Spotify authenticator response');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $responseBody = $this->createMock(StreamInterface::class);
-
-        $response->method('getStatusCode')->willReturn(200);
-        $response->method('getBody')->willReturn($responseBody);
-        $responseBody->method('__toString')->willReturn('{}');
-
-        $this->client->method('request')->willReturn($response);
-
-        $this->spotifyAuthenticator->getAccessToken();
+        $authenticator->getAccessToken();
     }
 
-    public function testGetAccessTokenThrowsExceptionOnBadResponseException()
+    public function testGetAccessTokenHandlesBadResponseException(): void
     {
+        $mockClient = \Mockery::mock(ClientInterface::class);
+        $mockResponse = \Mockery::mock(ResponseInterface::class);
+        $mockStream = \Mockery::mock(StreamInterface::class);
+
+        $mockResponse->shouldReceive('getStatusCode')
+            ->andReturn(401);
+
+        $mockResponse->shouldReceive('getReasonPhrase')
+            ->andReturn('Unauthorized');
+
+        $mockResponse->shouldReceive('getBody')
+            ->andReturn($mockStream);
+
+        $mockStream->shouldReceive('__toString')
+            ->andReturn('{"error": "invalid_client"}');
+
+        $exception = \Mockery::mock(BadResponseException::class);
+        $exception->shouldReceive('getResponse')
+            ->andReturn($mockResponse);
+
+        $mockClient->shouldReceive('request')
+            ->once()
+            ->andThrow($exception);
+
+        $logger = \Mockery::mock(LoggerInterface::class);
+        $logger->shouldReceive('error')->once();
+
+        $authenticator = new SpotifyAuthenticator($mockClient, 'client_id', 'client_secret');
+        $authenticator->setLogger($logger);
+
         $this->expectException(SpotifyAuthenticatorException::class);
         $this->expectExceptionMessage('Something went wrong while retrieving the Spotify bearerToken');
 
-        $badResponseException = $this->createMock(BadResponseException::class);
-        $badResponseException->method('getResponse')->willReturn($this->createMock(ResponseInterface::class));
-
-        $this->client->method('request')->willThrowException($badResponseException);
-        $this->logger->expects($this->once())->method('error');
-
-        $this->spotifyAuthenticator->getAccessToken();
+        $authenticator->getAccessToken();
     }
 }

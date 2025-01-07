@@ -2,8 +2,6 @@
 
 namespace App\TrackFinder\Transformer;
 
-use App\Domain\TrackCollection;
-use App\Domain\TrackCollectionItem;
 use App\TrackFinder\Domain\TrackSearchCollection;
 use App\TrackFinder\Domain\TrackSearchCollectionItem;
 

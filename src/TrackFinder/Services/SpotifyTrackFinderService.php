@@ -30,28 +30,6 @@ class SpotifyTrackFinderService implements TrackFinderServiceInterface, LoggerAw
         return TrackSearchCollection::fromSpotifyJson((string) $response->getBody());
     }
 
-//    public function getTrackCollectionFromTrackSearchCollection(TrackSearchCollection $trackSearchCollection): TrackCollection
-//    {
-//        $items = [];
-//        foreach ($trackSearchCollection->items as $trackSearchCollectionItem) {
-//            $items[] = $this->getTrackCollectionFromTrackSearchCollectionItem($trackSearchCollectionItem);
-//        }
-//
-//        if (empty($items)) {
-//            return TrackCollection::empty();
-//        }
-//
-//        return TrackCollection::fromArrayOfTrackCollectionItems($items);
-//    }
-//
-//    private function getTrackCollectionFromTrackSearchCollectionItem(TrackSearchCollectionItem $trackSearchCollectionItem): TrackCollectionItem
-//    {
-//        $query = sprintf('?artist=%s&q=%s&type=track&limit=1', $trackSearchCollectionItem->artist, $trackSearchCollectionItem->track);
-//        $response = $this->request('GET', sprintf('/v1/search%s', $query));
-//
-//        return TrackCollectionItem::fromSpotifyJson((string) $response->getBody());
-//    }
-
     private function request(string $method, string $uri, array $options = []): ResponseInterface
     {
         try {
